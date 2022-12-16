@@ -17,6 +17,7 @@ library(RColorBrewer)
 library(CGPfunctions)
 library(ggthemes)
 library(viridis)
+library(animation)
 
 
 
@@ -147,5 +148,33 @@ p1 <- ggplot(new_map_df, mapping = aes(x = long, y = lat, group = group)) +
   #coord_map("ortho", orientation = c(10, 75, 0)) +
   xlab("Longitude")  +
   ylab("Latitude") +
-  labs(title = "GDP per capita of countries overlayed with location of \nthe Universties for year 2022") +
+  labs(title = "GDP per capita of countries overlaid with location of \nthe Universties for year 2022") +
   theme_minimal();p1
+
+
+#########################
+# Globe GIF for 2022
+#########################
+
+rotate_globe <- function(angle){
+ ggplot(new_map_df, mapping = aes(x = long, y = lat, group = group)) +
+  coord_fixed(1.3) +
+  geom_polygon(aes(fill = GDPPC)) +
+  scale_fill_viridis_c(direction = -1, limits = c(0, 100000), oob = scales::squish) +
+  geom_path(aes(x = long, y = lat, group = group)) +
+  scale_color_brewer(palette="Set1") +
+  geom_point(aes(x = Longitude, y = Latitude, color = Continent)) +
+  coord_map("ortho", orientation = c(10, angle, 0)) +
+  xlab("Longitude")  +
+  ylab("Latitude") +
+  labs(title = "GDP per capita of countries overlaid with location of \nthe Universties for year 2022") +
+  theme_minimal() 
+}
+
+
+saveGIF({
+  ani.options(nmax = 360)
+  for(i in seq(0,360)){
+    print(rotate_globe(i))
+  }
+}, interval = 0.1, outdir="D:/R_IITK/SEM_1/R_IITK_SEM_1", movie.name = "globe.gif") ## use your target folder location in outdir.
